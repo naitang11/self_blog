@@ -69,7 +69,7 @@ function initScrollEffects() {
 // ---------------------- 文章加载 ----------------------
 async function loadArticleIndex() {
   try {
-    const res = await fetch('./articles/_index.json');
+    const res = await fetch('./articles/index.json');
     if (!res.ok) throw new Error('Failed to load _index.json');
     const data = await res.json();
     return Array.isArray(data) ? data : (data.articles || []);
