@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>关于 - 散人的博客</title>
+  <meta name="description" content="关于散人：一个喜欢把代码写到极致的前端开发者">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📝</text></svg>">
+  <style>
+    .about-hero { padding: 80px 24px 60px; text-align: center; }
+    .about-hero .avatar-ring { width: 100px; height: 100px; margin: 0 auto 24px; }
+    .about-hero .avatar-inner { font-size: 48px; }
+    .about-hero h1 { font-size: 2rem; font-weight: 700; margin-bottom: 8px; font-family: 'Noto Serif SC', serif; }
+    .about-hero .tagline { color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 20px; }
+    .about-body { max-width: 720px; margin: 0 auto; padding: 0 24px 80px; }
+    .about-section { margin-bottom: 48px; }
+    .about-section h2 { font-size: 1.2rem; font-weight: 600; color: var(--text-primary); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid var(--border); display: flex; align-items: center; gap: 8px; }
+    .about-section p { color: var(--text-secondary); line-height: 1.8; margin-bottom: 12px; }
+    .skill-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-top: 16px; }
+    .skill-item { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; font-size: 0.9rem; color: var(--text-primary); display: flex; align-items: center; gap: 8px; transition: border-color 0.2s, transform 0.2s; }
+    .skill-item:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .timeline { position: relative; padding-left: 24px; }
+    .timeline::before { content: ''; position: absolute; left: 7px; top: 8px; bottom: 8px; width: 2px; background: var(--border); }
+    .timeline-item { position: relative; margin-bottom: 28px; }
+    .timeline-item::before { content: ''; position: absolute; left: -20px; top: 8px; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); border: 2px solid var(--bg); }
+    .timeline-item .year { font-size: 0.8rem; font-weight: 600; color: var(--accent); margin-bottom: 4px; }
+    .timeline-item .event { font-size: 0.95rem; color: var(--text-primary); font-weight: 500; }
+    .timeline-item .detail { font-size: 0.88rem; color: var(--text-secondary); margin-top: 4px; line-height: 1.6; }
+    .contact-links { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 16px; }
+    .contact-link { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); text-decoration: none; font-size: 0.9rem; transition: all 0.2s; }
+    .contact-link:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+    @media (max-width: 600px) {
+      .about-hero { padding: 60px 20px 40px; }
+      .about-hero h1 { font-size: 1.6rem; }
+      .about-body { padding: 0 20px 60px; }
+      .skill-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress-bar" id="progressBar"></div>
+  <header class="navbar" id="navbar">
+    <div class="navbar-inner">
+      <a href="index.html" class="navbar-logo">
+        <span class="logo-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg></span>
+        <span class="logo-text">散人</span>
+      </a>
+      <div class="navbar-actions">
+        <button class="theme-toggle" id="themeToggle" title="切换主题">
+          <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+          <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+        <a href="index.html" class="nav-about" title="文章列表" style="color:var(--accent)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <section class="about-hero">
+    <div class="avatar-ring"><div class="avatar-inner">🧑‍💻</div></div>
+    <h1>关于散人</h1>
+    <p class="tagline">写代码 / 看足球 / 偶尔拍拍照</p>
+    <p style="max-width:500px;margin:0 auto;color:var(--text-secondary);line-height:1.7;">
+      一个喜欢把事情做到极致的开发者。这个博客用来记录学到的、想到的、和踩坑的。
+    </p>
+  </section>
+
+  <div class="about-body">
+    <section class="about-section">
+      <h2><span>👤</span> 我是谁</h2>
+      <p>你好，我是一个前端开发者，现居上海。从事前端开发工作多年，喜欢研究技术细节，追求代码的优雅和用户体验的极致。</p>
+      <p>这个博客是我 2026 年初从头手写的，没有用任何框架或静态网站生成器。就想做一个完全自己掌控的、简洁快速的个人空间。</p>
+      <p>除了写代码，我也看足球（皇马球迷 🏆），偶尔拍照，偶尔读书。技术之外的这些东西，有时候比代码有意思多了。</p>
+    </section>
+
+    <section class="about-section">
+      <h2><span>🛠️</span> 技术栈</h2>
+      <div class="skill-grid">
+        <div class="skill-item">⚡ HTML / CSS / JS</div>
+        <div class="skill-item">⚛️ React / Vue</div>
+        <div class="skill-item">🔧 Node.js</div>
+        <div class="skill-item">🐍 Python</div>
+        <div class="skill-item">🎨 CSS 艺术</div>
+        <div class="skill-item">🔒 Web 安全</div>
+        <div class="skill-item">⚡ 性能优化</div>
+        <div class="skill-item">📦 打包构建</div>
+        <div class="skill-item">🧪 自动化测试</div>
+        <div class="skill-item">🔄 CI / CD</div>
+      </div>
+    </section>
+
+    <section class="about-section">
+      <h2><span>📅</span> 里程碑</h2>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="year">2026</div>
+          <div class="event">上线个人博客 v1.0</div>
+          <div class="detail">用纯 Vanilla JS 从零搭建了这个博客，没有 Hexo，没有 Hugo，就三个 HTML 文件走天下。</div>
+        </div>
+        <div class="timeline-item">
+          <div class="year">2024</div>
+          <div class="event">全栈独立开发项目</div>
+          <div class="detail">从设计到前端到后端到部署，独立完成了一整套产品。深刻理解了什么叫"全栈"。</div>
+        </div>
+        <div class="timeline-item">
+          <div class="year">2022</div>
+          <div class="event">深入前端工程化</div>
+          <div class="detail">开始系统性研究构建工具、性能优化、CSS 架构，逐渐形成自己的前端方法论。</div>
+        </div>
+        <div class="timeline-item">
+          <div class="year">2020</div>
+          <div class="event">入行前端</div>
+          <div class="detail">从切图仔开始，一路打怪升级，经历了 jQuery 到 Vue/React 的时代变迁。</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="about-section">
+      <h2><span>💡</span> 做事的理念</h2>
+      <p><strong>"够用就好"</strong> —— 这是我这些年最深刻的感悟。过度工程是很多程序员的毛病，包括我自己。以前总想用最新的框架、最复杂的设计模式，结果维护成本比业务价值还高。现在更倾向于用<strong>最简单的方式解决问题</strong>，而不是最"酷"的方式。</p>
+      <p><strong>"细节决定体验"</strong> —— 一个像素的偏差、一行代码的顺序、一毫秒的响应延迟，用户其实都能感知到，只是说不出来。所以能优化的地方就尽量优化，别偷懒。</p>
+    </section>
+
+    <section class="about-section">
+      <h2><span>📬</span> 联系方式</h2>
+      <p>如果有什么想聊的，或者发现了博客里的 bug，欢迎通过以下方式联系我：</p>
+      <div class="contact-links">
+        <a href="mailto:hello@example.com" class="contact-link">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+          hello@example.com
+        </a>
+        <a href="https://github.com" target="_blank" rel="noopener" class="contact-link">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+          GitHub
+        </a>
+        <a href="https://twitter.com" target="_blank" rel="noopener" class="contact-link">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          Twitter
+        </a>
+      </div>
+    </section>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-left">
+        <span class="footer-logo">散人</span>
+        <p class="footer-copy">保持简洁，保持速度。</p>
+      </div>
+      <div class="footer-right">
+        <a href="index.html">文章</a>
+        <a href="about.html">关于</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/app.js"></script>
+  <script>
+    initTheme();
+    initScrollEffects();
+  </script>
+</body>
+</html>
