@@ -1,5 +1,5 @@
 (function () {
-  const API_BASE = '';  // 同源，生产环境由 server/index.js 提供
+  const API_BASE = 'https://selfblog-production.up.railway.app';  // Railway API
 
   // DOM
   const jokesList = document.getElementById('jokesList');
