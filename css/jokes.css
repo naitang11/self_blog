@@ -1,0 +1,176 @@
+/* ===== 段子页面 ===== */
+.jokes-section {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Hero */
+.jokes-hero {
+  text-align: center;
+  padding: 64px 24px 48px;
+}
+
+.jokes-hero-title {
+  font-family: "Noto Serif SC", Georgia, serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.jokes-hero-sub {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+/* 发布区 */
+.jokes-compose {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 32px;
+}
+
+.jokes-compose textarea {
+  width: 100%;
+  min-height: 80px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 12px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  background: var(--bg-color);
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.jokes-compose textarea:focus {
+  border-color: var(--accent-color);
+}
+
+.jokes-compose-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.btn-post {
+  background: var(--accent-color);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btn-post:hover {
+  opacity: 0.85;
+}
+
+.btn-post:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 列表 */
+.jokes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-bottom: 64px;
+}
+
+.joke-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 18px 20px;
+  transition: box-shadow 0.2s;
+}
+
+.joke-card:hover {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.joke-content {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+.joke-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.joke-date {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.joke-like {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border: none;
+  background: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: color 0.2s, background 0.2s;
+}
+
+.joke-like:hover {
+  color: var(--accent-color);
+  background: var(--tag-bg);
+}
+
+.joke-like.liked {
+  color: var(--accent-color);
+}
+
+/* 空状态 */
+.jokes-empty {
+  text-align: center;
+  padding: 48px 0;
+  color: var(--text-secondary);
+}
+
+.jokes-empty-icon {
+  font-size: 3rem;
+  margin-bottom: 12px;
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--text-primary);
+  color: var(--bg-color);
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  opacity: 0;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  z-index: 999;
+  pointer-events: none;
+}
+
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
