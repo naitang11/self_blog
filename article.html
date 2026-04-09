@@ -168,6 +168,22 @@ if (typeof marked === 'undefined') {
 </script>
   <script src="js/highlight.min.js"></script>
   <script src="js/app.js"></script>
-  <script src="js/article.js"></script>
+  <script>
+(function(){
+  function loadArticleJS(){
+    var s=document.createElement('script');
+    s.src='js/article.js';
+    document.body.appendChild(s);
+  }
+  if (typeof marked !== 'undefined') {
+    loadArticleJS();
+  } else {
+    var cdn=document.createElement('script');
+    cdn.src='https://cdn.jsdelivr.net/npm/marked/marked.min.js';
+    cdn.onload=loadArticleJS;
+    document.head.appendChild(cdn);
+  }
+})();
+</script>
 </body>
 </html>
