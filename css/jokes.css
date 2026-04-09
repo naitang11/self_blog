@@ -60,19 +60,19 @@
 }
 
 .btn-post {
-  background: var(--accent-color);
-  color: #fff;
+  background: #2563eb;
+  color: #ffffff;
   border: none;
   border-radius: 6px;
   padding: 8px 20px;
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
-  transition: opacity 0.2s;
+  transition: background 0.2s, opacity 0.2s;
 }
 
 .btn-post:hover {
-  opacity: 0.85;
+  background: #1d4ed8;
 }
 
 .btn-post:disabled {

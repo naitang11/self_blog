@@ -1,15 +1,19 @@
 {
-  "name": "blog",
+  "name": "self-blog",
   "version": "1.0.0",
-  "main": "index.js",
+  "description": "个人博客",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "node server/index.js",
+    "client": "npx serve . -p 3000",
+    "start": "NODE_ENV=production node server/index.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
-    "playwright": "^1.59.1"
+    "better-sqlite3": "^9.4.3",
+    "cors": "^2.8.5",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
   }
 }
