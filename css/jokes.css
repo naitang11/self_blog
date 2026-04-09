@@ -118,6 +118,12 @@
   color: var(--text-secondary);
 }
 
+.joke-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .joke-like {
   display: flex;
   align-items: center;
@@ -139,6 +145,25 @@
 
 .joke-like.liked {
   color: var(--accent-color);
+}
+
+.joke-delete {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border: none;
+  background: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: color 0.2s, background 0.2s;
+}
+
+.joke-delete:hover {
+  color: #e74c3c;
+  background: rgba(231, 76, 60, 0.1);
 }
 
 /* 空状态 */
