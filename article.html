@@ -159,6 +159,13 @@
   </button>
 
   <script src="js/marked.min.js"></script>
+<script>
+if (typeof marked === 'undefined') {
+  var script = document.createElement('script');
+  script.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
+  document.head.appendChild(script);
+}
+</script>
   <script src="js/highlight.min.js"></script>
   <script src="js/app.js"></script>
   <script src="js/article.js"></script>
