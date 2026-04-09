@@ -6,8 +6,6 @@ const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
-console.log('📦 PORT from env:', process.env.PORT);
-console.log('📦 Final binding port:', PORT);
 
 // Railway 挂载的磁盘路径
 const RAILWAY_VOLUME_PATH = process.env.RAILWAY_VOLUME_PATH;
@@ -130,6 +128,6 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-app.listen(PORT, () => {
-  console.log(`🚀 服务器运行在 http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 服务器运行在 http://0.0.0.0:${PORT}`);
 });
