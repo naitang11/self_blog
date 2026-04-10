@@ -285,46 +285,81 @@ function setTheme(theme) {
 
 // 加载文章详情
 function loadArticleDetail() {
-    const params = new URLSearchParams(window.location.search);
-    const id = parseInt(params.get('id'));
-    const article = ARTICLES[id];
+    const articleBody = document.getElementById('articleBody');
+    const articleTitle = document.getElementById('articleTitle');
 
-    if (!article) {
-        document.getElementById('articleBody').innerHTML = '<div class="error">文章不存在</div>';
-        return;
+    try {
+        const params = new URLSearchParams(window.location.search);
+        const id = parseInt(params.get('id'), 10);
+        const article = ARTICLES[id];
+
+        if (!article) {
+            if (articleTitle) articleTitle.textContent = '文章不存在';
+            if (articleBody) articleBody.innerHTML = '<div class="error">文章不存在</div>';
+            return;
+        }
+
+        // 渲染文章
+        const content = marked.parse(article.content);
+        if (articleTitle) articleTitle.textContent = article.title;
+        if (articleBody) {
+            articleBody.innerHTML = `
+                <article class="article">
+                    <h1>${article.title}</h1>
+                    <div class="meta">
+                        <span class="date">${article.date}</span> |
+                        <span class="read-time">${article.readTime}</span>
+                    </div>
+                    <div class="tags">
+                        ${article.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                    </div>
+                    <div class="content">${content}</div>
+                    <div class="pagination">
+                        ${article.prev ? `<a href="article.html?id=${article.prev}" class="prev">← 上一篇</a>` : '<span></span>'}
+                        ${article.next ? `<a href="article.html?id=${article.next}" class="next">下一篇 →</a>` : '<span></span>'}
+                    </div>
+                </article>
+            `;
+        }
+
+        // 代码高亮
+        if (typeof hljs !== 'undefined') {
+            document.querySelectorAll('pre code').forEach(block => {
+                hljs.highlightElement(block);
+            });
+        }
+
+        // 更新主题图标
+        if (typeof updateThemeIcon === 'function') {
+            updateThemeIcon();
+        }
+    } catch (error) {
+        if (articleTitle) articleTitle.textContent = '加载失败';
+        if (articleBody) {
+            articleBody.innerHTML = '<div class="error">文章加载失败，请稍后重试</div>';
+        }
+        console.error('loadArticleDetail error:', error);
     }
-
-    // 渲染文章
-    const content = marked.parse(article.content);
-    document.getElementById('articleBody').innerHTML = `
-        <article class="article">
-            <h1>${article.title}</h1>
-            <div class="meta">
-                <span class="date">${article.date}</span> |
-                <span class="read-time">${article.readTime}</span>
-            </div>
-            <div class="tags">
-                ${article.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
-            </div>
-            <div class="content">${content}</div>
-            <div class="pagination">
-                ${article.prev ? `<a href="article.html?id=${article.prev}" class="prev">← 上一篇</a>` : '<span></span>'}
-                ${article.next ? `<a href="article.html?id=${article.next}" class="next">下一篇 →</a>` : '<span></span>'}
-            </div>
-        </article>
-    `;
-
-    // 代码高亮
-    document.querySelectorAll('pre code').forEach(block => {
-        hljs.highlightElement(block);
-    });
-
-    // 更新主题图标
-    updateThemeIcon();
 }
 
 // 初始化
-document.addEventListener('DOMContentLoaded', () => {
+function initArticlePage() {
     loadArticleDetail();
-    setupThemeToggle();
-});
+    if (typeof setupThemeToggle === 'function') {
+        setupThemeToggle();
+    }
+}
+
+// DOMContentLoaded 时初始化（处理页面直接打开的情况）
+function onDOMReady(fn) {
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', fn);
+    } else {
+        fn();
+    }
+}
+
+// 兼容两种加载方式：
+// 1. 静态 <script src="article.js"> 直接在 DOMContentLoaded 前加载
+// 2. 动态创建 <script> 在 marked.js 之后加载（此时 readyState 已不是 loading）
+onDOMReady(initArticlePage);
