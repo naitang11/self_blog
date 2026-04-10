@@ -1,196 +1,114 @@
-// 文章数据
+// 文章数据（硬编码，因为 GitHub Pages 不支持运行时请求 JSON）
 const ARTICLES = {
   1: {
     id: 1,
-    title: '使用 Vercel 部署静态网站',
-    date: '2026-04-08',
-    tags: ['Vercel', '部署'],
+    title: '欢迎来到我的博客',
+    date: '2026-04-09',
+    tags: ['随笔'],
     readTime: '1 分钟',
     prev: null,
     next: 2,
-    content: `在使用 Vercel 部署静态网站之前，需要准备以下工具：
+    content: `
+# 欢迎来到我的博客
 
-1. **Node.js** - 用于运行 Vercel CLI
-2. **Git** - 用于将代码推送到仓库
-3. **Vercel 账号** - 可以使用 GitHub 账号登录
+这是我的第一个博客文章，用来测试博客功能是否正常。
 
-## 安装 Vercel CLI
+## 关于这个博客
 
-打开终端，运行以下命令安装 Vercel CLI：
+这个博客是我用 AI 助手从零开始搭建的。
 
-\`\`\`bash
-npm install -g vercel
-\`\`\`
+主要用来记录一些技术笔记和日常思考。
 
-## 部署步骤
+## 技术栈
 
-### 1. 登录 Vercel
-
-在终端中运行以下命令登录：
-
-\`\`\`bash
-vercel login
-\`\`\`
-
-### 2. 初始化项目
-
-进入项目目录，运行：
-
-\`\`\`bash
-vercel
-\`\`\`
-
-按照提示输入项目名称和其他配置。
-
-### 3. 部署到生产环境
-
-当您准备好部署到生产环境时，运行：
-
-\`\`\`bash
-vercel --prod
-\`\`\`
-
-## 绑定域名
-
-在 Vercel 控制台中，可以轻松地绑定自定义域名。
-
-前往项目设置 → Domains，添加您的域名即可。
-
-## 自动部署
-
-当您推送代码到 GitHub 时，Vercel 会自动重新部署网站。
+- 前端：HTML + CSS + JavaScript
+- 部署：GitHub Pages
+- 图床：SM.MS
 
 ---
-
-部署从未如此简单！`
+*首发于 2026-04-09*
+    `
   },
   2: {
     id: 2,
-    title: 'CSS 变量实现主题切换',
-    date: '2026-04-08',
-    tags: ['CSS', '前端'],
-    readTime: '2 分钟',
+    title: 'Python 入门指南',
+    date: '2026-04-09',
+    tags: ['技术', 'Python'],
+    readTime: '5 分钟',
     prev: 1,
     next: 3,
-    content: `使用 CSS 变量可以轻松实现主题切换功能。
+    content: `
+# Python 入门指南
 
-## CSS 变量基础
+Python 是一门简单易学的编程语言，适合初学者。
 
-CSS 变量使用 \`--\` 前缀定义：
+## 基本语法
 
-\`\`\`css
-:root {
-  --bg-color: #ffffff;
-  --text-color: #333333;
-}
+### 变量
 
-body {
-  background-color: var(--bg-color);
-  color: var(--text-color);
-}
+\`\`\`python
+name = "Alice"
+age = 25
 \`\`\`
 
-## 暗色主题
+### 条件语句
 
-在 \`data-theme="dark"\` 属性下覆盖变量：
-
-\`\`\`css
-[data-theme="dark"] {
-  --bg-color: #1a1a1a;
-  --text-color: #ffffff;
-}
+\`\`\`python
+if age >= 18:
+    print("成年")
+else:
+    print("未成年")
 \`\`\`
 
-## JavaScript 切换
+### 循环
 
-\`\`\`javascript
-function toggleTheme() {
-  const html = document.documentElement;
-  const current = html.getAttribute('data-theme');
-  const next = current === 'dark' ? 'light' : 'dark';
-  html.setAttribute('data-theme', next);
-  localStorage.setItem('theme', next);
-}
+\`\`\`python
+for i in range(5):
+    print(i)
 \`\`\`
 
-## 本地存储
+## 为什么学 Python
 
-使用 localStorage 保存用户偏好：
+1. 语法简单
+2. 生态丰富
+3. 应用广泛
 
-\`\`\`javascript
-// 页面加载时
-const saved = localStorage.getItem('theme');
-if (saved) {
-  document.documentElement.setAttribute('data-theme', saved);
-}
-\`\`\`
-
-这样用户的选择会被记住，下次访问时自动应用。`
+---
+*首发于 2026-04-09*
+    `
   },
   3: {
     id: 3,
-    title: 'Markdown 测试',
-    date: '2026-04-08',
-    tags: ['测试'],
-    readTime: '1 分钟',
+    title: '为什么 AI 是未来',
+    date: '2026-04-09',
+    tags: ['技术', 'AI'],
+    readTime: '3 分钟',
     prev: 2,
     next: 4,
-    content: `# Markdown 测试
+    content: `
+# 为什么 AI 是未来
 
-这是一篇测试文章，用于验证 Markdown 渲染是否正常工作。
+AI 正在改变各行各业。
 
-## 标题
+## 应用场景
 
-支持多级标题。
+- 医疗：辅助诊断
+- 金融：风险评估
+- 教育：个性化学习
+- 娱乐：游戏 AI
 
-### 三级标题
+## AI 能做什么
 
-#### 四级标题
+现在的 AI 已经可以：
 
-## 列表
-
-### 无序列表
-
-- 苹果
-- 香蕉
-- 橙子
-
-### 有序列表
-
-1. 第一步
-2. 第二步
-3. 第三步
-
-## 代码块
-
-### 行内代码
-
-这是 \`行内代码\` 示例。
-
-### 代码块
-
-\`\`\`javascript
-function hello() {
-  console.log('Hello, World!');
-}
-\`\`\`
-
-## 引用
-
-> 这是一段引用文本。
-> 可以有多行。
-
-## 链接
-
-[我的博客](https://blog.selfai.cn)
-
-## 图片
-
-![占位图片](https://via.placeholder.com/400x200)
+- 写作、翻译
+- 生成图片
+- 写代码
+- 回答问题
 
 ---
-
-测试完成！`
+*首发于 2026-04-09*
+    `
   },
   4: {
     id: 4,
@@ -199,227 +117,214 @@ function hello() {
     tags: ['技术', '复盘'],
     readTime: '3 分钟',
     prev: 3,
-    next: null,
-    content: `# 从零搭个人博客：我都干了什么
+    next: 5,
+    content: `
+# 从零搭个人博客：我都干了什么
 
-## 前言
+用 AI 助手从零搭了一个个人博客，记录一下过程、遇到的问题和解决方案。
 
-从零开始搭了一个个人博客，部署在 Vercel 上。
+## 技术选型
 
-写这个博客的主要目的是记录自己的学习过程，方便以后回顾。所以内容主要涉及技术方面，也会夹杂一些其他有趣的东西。
-
-## 技术栈
-
-- **前端**: HTML + CSS + JavaScript（无框架）
-- **后端**: 无（纯静态页面）
-- **部署**: Vercel
-- **域名**: 阿里云
-
-## 搭建过程
-
-### 1. 初始化项目
-
-创建一个项目文件夹，初始化 Git 仓库。
-
-### 2. 编写页面
-
-写了三个页面：
-
-- \`index.html\` - 首页，展示文章列表
-- \`article.html\` - 文章页，展示单篇文章内容
-- \`about.html\` - 关于页
-
-### 3. CSS 样式
-
-使用 CSS 变量实现主题切换（亮色/暗色），通过 localStorage 保存用户偏好。
-
-### 4. JavaScript 功能
-
-- 文章列表渲染
-- 文章内容加载（支持 Markdown）
-- 主题切换
-
-### 5. 部署
-
-推送到 GitHub，连接 Vercel 自动部署。
-
-### 6. 域名配置
-
-在阿里云购买域名，配置 DNS 解析到 Vercel。
+- 纯原生 HTML + CSS + JS，无框架
+- marked.js 渲染 Markdown
+- highlight.js 代码高亮
+- highlight.js 代码高亮
+- 部署在 GitHub Pages
 
 ## 遇到的问题
 
-### CSS 样式问题
+### 1. 文章加载失败
 
-早期版本使用 CDN 加载 CSS，遇到过加载慢或失败的问题。后来改为本地存储。
+GitHub Pages 不给 JSON 文件设置 UTF-8 编码，导致中文乱码。
 
-### Markdown 渲染
+**解决：** 把 JSON 改成 JS 变量文件，浏览器正确处理编码。
 
-使用 marked.js 库解析 Markdown。代码高亮使用 highlight.js。
+### 2. CORS 跨域
 
-### 主题切换
+API 部署在 Railway，前端在 GitHub Pages，不同域名请求会触发跨域。
 
-使用 CSS 变量的 \`data-theme\` 属性实现。暗色主题通过给 html 标签添加 \`data-theme="dark"\` 属性触发。
+**解决：** Railway API 配置了 \\`Access-Control-Allow-Origin: *\\` 允许所有来源。
 
-## 后续计划
+### 3. 域名 DNS 丢失
 
-- [ ] 完善文章内容
-- [ ] 优化页面样式
-- [ ] 添加更多功能（如搜索、标签筛选）
-- [ ] 移动端适配
+\\`blog.selfai.cn\\` 的 DNS 记录丢失，目前用 GitHub Pages 原生地址访问。
 
 ## 总结
 
-搭个人博客不难，难的是坚持写下去。希望能坚持下去吧。
+动手搭一个博客比想象中简单，AI 助手帮了大忙。
+
+---
+*首发于 2026-04-08*
+    `
+  },
+  5: {
+    id: 5,
+    title: '段子书屋的技术内幕',
+    date: '2026-04-10',
+    tags: ['技术', '复盘'],
+    readTime: '3 分钟',
+    prev: 4,
+    next: null,
+    content: `
+# 段子书屋的技术内幕
+
+今天把段子书屋的加载失败问题修好了，借机把整个架构梳理一下，顺便记录这次踩的坑。
 
 ---
 
-*首发于 2026-04-08*`
+## 段子书屋是什么
+
+一个供网友发布和浏览段子的独立页面，类似于一个极简版的微博。
+
+---
+
+## 技术架构
+
+整个系统分两层：**前端** + **后端 API**。
+
+### 前端（GitHub Pages）
+
+纯原生 HTML + CSS + JS，没有任何框架。
+
+核心文件：
+
+- \\`jokes.html\\` — 页面骨架
+- \\`js/jokes.js\\` — 所有交互逻辑
+- \\`css/jokes.css\\` — 样式，支持深色/浅色主题
+
+技术选型：
+- 无框架（Vanilla JS）
+- API 请求用原生 fetch
+
+### 后端 API（Railway）
+
+跑在 Railway 上的 Node.js + Express REST API。
+
+服务器端文件：
+- \\`server/index.js\\` — Express 服务器
+
+接口：
+
+| 接口 | 方法 | 作用 |
+|------|------|------|
+| \\`/api/jokes\\` | GET | 获取所有段子 |
+| \\`/api/jokes\\` | POST | 发布新段子 |
+| \\`/api/jokes/:id\\` | DELETE | 删除段子 |
+| \\`/api/jokes/:id/like\\` | POST | 点赞/取消点赞 |
+
+数据存在 **SQLite** 数据库。
+
+---
+
+## 数据流
+
+\\`\\`\\`
+用户打开 jokes.html
+       ↓
+jokes.js 调用 fetch 请求
+       ↓
+Railway API (selfblog-production.up.railway.app)
+       ↓
+SQLite 数据库读写
+\\`\\`\\`
+
+---
+
+## 这次踩的坑
+
+### 坑一：API_BASE 用相对路径
+
+**问题现象：** 段子书屋页面一直显示"加载失败"。
+
+**根本原因：** \\`jokes.js\\` 里的 \\`API_BASE = ''\\`，使用相对路径 \\`/api/jokes\\`。但 GitHub Pages 是纯静态托管，没有后端服务器，所有 \\`/api/*\\` 请求都会 404。
+
+**解决：** 把 \\`API_BASE\\` 改成 Railway 完整地址：
+
+\\`\\`\\`js
+const API_BASE = 'https://selfblog-production.up.railway.app';
+\\`\\`\\`
+
+**教训：** 记清楚托管方式很重要。静态托管（GitHub Pages/Vercel）没有后端，必须用完整 API URL。
+
+### 坑二：记错了托管地址
+
+**问题现象：** 一开始以为博客在 \\`blog.selfai.cn\\`（Vercel），查了半天 DNS。
+
+**根本原因：** 记忆里的信息和实际不符。实际托管在 \\`naitang11.github.io/self_blog/\\`（GitHub Pages）。
+
+**解决：** 先用 \\`curl\\` 或浏览器验证实际地址，再排查问题。
+
+**教训：** 每次排查前先确认「网站到底在哪」，不要依赖记忆。
+
+---
+
+## 域名 DNS 丢失（待解决）
+
+\\`blog.selfai.cn\\` 这个域名目前 DNS 记录已丢失（NS 服务器是 DNSPod，但域名找不到）。不影响使用，GitHub Pages 地址正常。
+
+---
+
+## 反思
+
+1. **静态托管 + 外部 API 是常用组合**，但要注意 API 地址必须用完整 URL，不能用相对路径。
+2. **记忆不可靠，写到文件里才可靠**。这次 MEMORY.md 里的信息过时了，导致走了弯路。
+3. **先验证再排查**，确认了地址正确再动手修。
+
+---
+*首发于 2026-04-10*
+    `
   }
 };
 
 // 主题相关
-function initTheme() {
-  const saved = localStorage.getItem('theme');
-  if (saved) {
-    document.documentElement.setAttribute('data-theme', saved);
-  }
+function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+    updateThemeIcon();
 }
 
-function toggleTheme() {
-  const html = document.documentElement;
-  const current = html.getAttribute('data-theme');
-  const next = current === 'dark' ? 'light' : 'dark';
-  html.setAttribute('data-theme', next);
-  localStorage.setItem('theme', next);
-}
-
-// 滚动效果
-function initScrollEffects() {
-  const header = document.querySelector('header');
-  let lastScroll = 0;
-
-  window.addEventListener('scroll', () => {
-    const currentScroll = window.pageYOffset;
-
-    if (currentScroll <= 0) {
-      header.classList.remove('hidden');
-      return;
-    }
-
-    if (currentScroll > lastScroll && currentScroll > 100) {
-      header.classList.add('hidden');
-    } else {
-      header.classList.remove('hidden');
-    }
-
-    lastScroll = currentScroll;
-  });
-}
-
-// 获取 URL 参数
-function getArticleId() {
-  const params = new URLSearchParams(window.location.search);
-  return parseInt(params.get('id')) || 1;
-}
-
-// 获取文章内容
-function getArticleContent(article) {
-  if (article.content) {
-    return marked.parse(article.content);
-  }
-  return '<p>文章内容加载失败</p>';
-}
-
-// 加载文章
-function loadArticle(id) {
-  return new Promise((resolve, reject) => {
+// 加载文章详情
+function loadArticleDetail() {
+    const params = new URLSearchParams(window.location.search);
+    const id = parseInt(params.get('id'));
     const article = ARTICLES[id];
+
     if (!article) {
-      reject(new Error('文章不存在'));
-      return;
+        document.getElementById('articleBody').innerHTML = '<div class="error">文章不存在</div>';
+        return;
     }
 
-    if (article.content) {
-      resolve(article);
-    } else {
-      reject(new Error('文章内容为空'));
-    }
-  });
-}
+    // 渲染文章
+    const content = marked.parse(article.content);
+    document.getElementById('articleBody').innerHTML = `
+        <article class="article">
+            <h1>${article.title}</h1>
+            <div class="meta">
+                <span class="date">${article.date}</span> |
+                <span class="read-time">${article.readTime}</span>
+            </div>
+            <div class="tags">
+                ${article.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+            </div>
+            <div class="content">${content}</div>
+            <div class="pagination">
+                ${article.prev ? `<a href="article.html?id=${article.prev}" class="prev">← 上一篇</a>` : '<span></span>'}
+                ${article.next ? `<a href="article.html?id=${article.next}" class="next">下一篇 →</a>` : '<span></span>'}
+            </div>
+        </article>
+    `;
 
-// 渲染文章
-function renderArticle(article) {
-  const titleEl = document.getElementById('articleTitle');
-  const tagsEl = document.getElementById('articleTags');
-  const bodyEl = document.getElementById('articleBody');
-
-  if (titleEl) titleEl.textContent = article.title;
-
-  if (tagsEl) {
-    tagsEl.innerHTML = article.tags.map(tag => `<span class="tag">${tag}</span>`).join('');
-  }
-
-  if (bodyEl) {
-    bodyEl.innerHTML = getArticleContent(article);
-    renderTOC();
-  }
-}
-
-// 渲染目录
-function renderTOC() {
-  const tocNav = document.getElementById('tocNav');
-  if (!tocNav) return;
-
-  const headings = document.querySelectorAll('#articleBody h2, #articleBody h3');
-  if (headings.length === 0) {
-    tocNav.innerHTML = '';
-    return;
-  }
-
-  let toc = '<ul>';
-  headings.forEach((heading, index) => {
-    const id = `heading-${index}`;
-    heading.id = id;
-    const level = heading.tagName === 'H2' ? '2' : '3';
-    toc += `<li class="toc-${level}"><a href="#${id}">${heading.textContent}</a></li>`;
-  });
-  toc += '</ul>';
-
-  tocNav.innerHTML = toc;
-}
-
-// 初始化内容
-function renderContent() {
-  const id = getArticleId();
-  const loadingEl = document.getElementById('loading');
-  const errorEl = document.getElementById('error');
-  const contentEl = document.getElementById('articleContent');
-
-  loadArticle(id)
-    .then(article => {
-      renderArticle(article);
-      if (loadingEl) loadingEl.style.display = 'none';
-      if (contentEl) contentEl.style.display = 'block';
-    })
-    .catch(error => {
-      console.error('加载文章失败:', error);
-      if (loadingEl) loadingEl.style.display = 'none';
-      if (errorEl) {
-        errorEl.style.display = 'flex';
-        errorEl.querySelector('p').textContent = '文章加载失败，请稍后重试。';
-      }
+    // 代码高亮
+    document.querySelectorAll('pre code').forEach(block => {
+        hljs.highlightElement(block);
     });
+
+    // 更新主题图标
+    updateThemeIcon();
 }
 
 // 初始化
-function onReady() {
-  initTheme();
-  initScrollEffects();
-  renderContent();
-}
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', onReady);
-} else {
-  onReady();
-}
+document.addEventListener('DOMContentLoaded', () => {
+    loadArticleDetail();
+    setupThemeToggle();
+});
