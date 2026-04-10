@@ -20,15 +20,16 @@ function renderArticles(items) {
     items.forEach(article => {
         const card = document.createElement('div');
         card.className = 'article-card';
+        card.setAttribute('data-url', `article.html?id=${article.id}`);
         card.innerHTML = `
-            <h2><a href="article.html?id=${article.id}">${article.title}</a></h2>
-            <div class="meta">
-                <span class="date">${article.date}</span> |
-                <span class="read-time">${article.readTime}</span>
+            <h2 class="card-title"><a href="article.html?id=${article.id}">${article.title}</a></h2>
+            <div class="card-excerpt">${article.excerpt}</div>
+            <div class="card-tags">
+                ${article.tags.map(tag => `<span class="card-tag">${tag}</span>`).join('')}
             </div>
-            <p>${article.excerpt}</p>
-            <div class="tags">
-                ${article.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+            <div class="card-meta">
+                <span class="date">${article.date}</span>
+                <span class="read-time">${article.readTime}</span>
             </div>
         `;
         list.appendChild(card);
@@ -78,6 +79,22 @@ function setupSearch() {
     bindInput(document.getElementById('mobileSearchInput'));
 }
 
+function setupArticleCardNavigation() {
+    const list = getArticleListEl();
+    if (!list) return;
+
+    list.addEventListener('click', (e) => {
+        const targetLink = e.target.closest('a');
+        if (targetLink) return;
+
+        const card = e.target.closest('.article-card');
+        if (!card) return;
+
+        const url = card.getAttribute('data-url');
+        if (url) window.location.href = url;
+    });
+}
+
 // 主题相关
 function setTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
@@ -121,5 +138,6 @@ document.addEventListener('DOMContentLoaded', () => {
     setTheme(savedTheme);
     loadArticles();
     setupSearch();
+    setupArticleCardNavigation();
     setupThemeToggle();
 });
