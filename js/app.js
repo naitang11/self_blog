@@ -1,13 +1,23 @@
 // 文章数据（从全局 articles.js 加载）
 // loadArticles 从 articles.js 全局变量读取文章列表
 
-// 从全局 articles.js 变量获取文章列表
-function loadArticles() {
-    const list = document.getElementById('article-list');
-    if (!list) return;
-    list.innerHTML = '';
+function getArticleListEl() {
+    return document.getElementById('articlesGrid') || document.getElementById('article-list');
+}
 
-    articles.forEach(article => {
+function renderArticles(items) {
+    const list = getArticleListEl();
+    if (!list) return;
+
+    list.innerHTML = '';
+    if (!items || items.length === 0) {
+        list.innerHTML = '<div class="empty">没有找到相关文章</div>';
+        const filteredCountEl = document.getElementById('filteredCount');
+        if (filteredCountEl) filteredCountEl.textContent = '0';
+        return;
+    }
+
+    items.forEach(article => {
         const card = document.createElement('div');
         card.className = 'article-card';
         card.innerHTML = `
@@ -23,35 +33,49 @@ function loadArticles() {
         `;
         list.appendChild(card);
     });
+
+    const filteredCountEl = document.getElementById('filteredCount');
+    if (filteredCountEl) filteredCountEl.textContent = String(items.length);
+}
+
+function updateHomeStats() {
+    const articleCountEl = document.getElementById('articleCount');
+    if (articleCountEl) articleCountEl.textContent = String(articles.length);
+
+    const tagCountEl = document.getElementById('tagCount');
+    if (tagCountEl) {
+        const tagSet = new Set();
+        articles.forEach(article => article.tags.forEach(tag => tagSet.add(tag)));
+        tagCountEl.textContent = String(tagSet.size);
+    }
+}
+
+// 从全局 articles.js 变量获取文章列表
+function loadArticles() {
+    if (!Array.isArray(articles)) return;
+    renderArticles(articles);
+    updateHomeStats();
 }
 
 // 搜索功能
 function searchArticles(query) {
+    if (!Array.isArray(articles)) return;
     const filtered = articles.filter(a =>
         a.title.includes(query) || a.excerpt.includes(query) || a.tags.some(t => t.includes(query))
     );
-    const list = document.getElementById('article-list');
-    list.innerHTML = '';
-    if (filtered.length === 0) {
-        list.innerHTML = '<div class="empty">没有找到相关文章</div>';
-        return;
-    }
-    filtered.forEach(article => {
-        const card = document.createElement('div');
-        card.className = 'article-card';
-        card.innerHTML = `
-            <h2><a href="article.html?id=${article.id}">${article.title}</a></h2>
-            <div class="meta">
-                <span class="date">${article.date}</span> |
-                <span class="read-time">${article.readTime}</span>
-            </div>
-            <p>${article.excerpt}</p>
-            <div class="tags">
-                ${article.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
-            </div>
-        `;
-        list.appendChild(card);
-    });
+    renderArticles(filtered);
+}
+
+function setupSearch() {
+    const bindInput = (input) => {
+        if (!input) return;
+        input.addEventListener('input', () => {
+            searchArticles(input.value.trim());
+        });
+    };
+
+    bindInput(document.getElementById('searchInput'));
+    bindInput(document.getElementById('mobileSearchInput'));
 }
 
 // 主题相关
@@ -96,5 +120,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const savedTheme = localStorage.getItem('theme') || 'light';
     setTheme(savedTheme);
     loadArticles();
+    setupSearch();
     setupThemeToggle();
 });
