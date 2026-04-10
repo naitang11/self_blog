@@ -67,10 +67,21 @@ function toggleTheme() {
 }
 
 function updateThemeIcon() {
-    const icon = document.querySelector('.theme-toggle i');
-    if (!icon) return;
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+
+    // Prefer SVG icons used by current pages; keep <i> fallback for legacy markup.
+    const sun = document.querySelector('.theme-toggle .icon-sun');
+    const moon = document.querySelector('.theme-toggle .icon-moon');
+    if (sun && moon) {
+        sun.style.display = isDark ? 'inline' : 'none';
+        moon.style.display = isDark ? 'none' : 'inline';
+        return;
+    }
+
+    const icon = document.querySelector('.theme-toggle i');
+    if (icon) {
+        icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+    }
 }
 
 function setupThemeToggle() {
@@ -82,6 +93,8 @@ function setupThemeToggle() {
 
 // 初始化
 document.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    setTheme(savedTheme);
     loadArticles();
     setupThemeToggle();
 });

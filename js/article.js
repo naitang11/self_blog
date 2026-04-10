@@ -46,26 +46,26 @@ Python 是一门简单易学的编程语言，适合初学者。
 
 ### 变量
 
-```python
+~~~python
 name = "Alice"
 age = 25
-```
+~~~
 
 ### 条件语句
 
-```python
+~~~python
 if age >= 18:
     print("成年")
 else:
     print("未成年")
-```
+~~~
 
 ### 循环
 
-```python
+~~~python
 for i in range(5):
     print(i)
-```
+~~~
 
 ## 为什么学 Python
 
@@ -240,9 +240,9 @@ SQLite 数据库读写
 
 **解决：** 把 \`API_BASE\` 改成 Railway 完整地址：
 
-```js
+~~~js
 const API_BASE = 'https://selfblog-production.up.railway.app';
-```
+~~~
 
 **教训：** 记清楚托管方式很重要。静态托管（GitHub Pages/Vercel）没有后端，必须用完整 API URL。
 
@@ -283,6 +283,30 @@ function setTheme(theme) {
     updateThemeIcon();
 }
 
+function sanitizeHtml(html) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+
+    // Remove dangerous elements entirely.
+    doc.querySelectorAll('script, iframe, object, embed, link, style, meta').forEach(el => el.remove());
+
+    // Strip inline event handlers and javascript: URLs.
+    doc.querySelectorAll('*').forEach(el => {
+        Array.from(el.attributes).forEach(attr => {
+            const name = attr.name.toLowerCase();
+            const value = (attr.value || '').trim().toLowerCase();
+            const isScriptUrl = (name === 'href' || name === 'src') && value.startsWith('javascript:');
+            const isHtmlDataUrl = (name === 'href' || name === 'src') && value.startsWith('data:text/html');
+
+            if (name.startsWith('on') || isScriptUrl || isHtmlDataUrl) {
+                el.removeAttribute(attr.name);
+            }
+        });
+    });
+
+    return doc.body.innerHTML;
+}
+
 // 加载文章详情
 function loadArticleDetail() {
     const articleBody = document.getElementById('articleBody');
@@ -300,7 +324,7 @@ function loadArticleDetail() {
         }
 
         // 渲染文章
-        const content = marked.parse(article.content);
+        const content = sanitizeHtml(marked.parse(article.content));
         if (articleTitle) articleTitle.textContent = article.title;
         if (articleBody) {
             articleBody.innerHTML = `
