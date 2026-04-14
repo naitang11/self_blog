@@ -12,6 +12,36 @@ const pool = new Pool({
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
 });
 
+// 管理员密钥（删除操作需要）
+const ADMIN_SECRET = process.env.ADMIN_SECRET || 'admin123';
+
+// 限流：每 5 分钟最多 5 条（按 IP 缓存）
+const rateLimitMap = new Map(); // key: ip, value: { count, resetAt }
+
+function checkRateLimit(ip) {
+  const now = Date.now();
+  const record = rateLimitMap.get(ip);
+
+  if (!record || now > record.resetAt) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + 5 * 60 * 1000 });
+    return { allowed: true, remaining: 4 };
+  }
+
+  if (record.count >= 5) {
+    return { allowed: false, remaining: 0, retryAfter: Math.ceil((record.resetAt - now) / 1000) };
+  }
+
+  record.count++;
+  return { allowed: true, remaining: 5 - record.count };
+}
+
+function getClientIp(req) {
+  return req.headers['x-forwarded-for']?.split(',')[0]?.trim()
+    || req.headers['x-real-ip']
+    || req.socket.remoteAddress
+    || 'unknown';
+}
+
 console.log('📦 数据库: PostgreSQL (Railway)');
 
 // 初始化表
@@ -29,7 +59,6 @@ async function initDB() {
       )
     `);
 
-    // 预置段子（如果表是空的）
     const res = await client.query('SELECT COUNT(*) FROM jokes');
     if (parseInt(res.rows[0].count) === 0) {
       const defaults = [
@@ -70,7 +99,7 @@ if (process.env.NODE_ENV === 'production') {
 
 // --- API ---
 
-// GET 所有段子
+// GET 所有段子（公开）
 app.get('/api/jokes', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM jokes ORDER BY createdAt DESC');
@@ -80,25 +109,46 @@ app.get('/api/jokes', async (req, res) => {
   }
 });
 
-// POST 发段子
+// POST 发段子（限流）
 app.post('/api/jokes', async (req, res) => {
+  const ip = getClientIp(req);
+  const limit = checkRateLimit(ip);
+
+  if (!limit.allowed) {
+    return res.status(429).json({
+      error: '发布太频繁，请稍后再试',
+      retryAfter: limit.retryAfter,
+    });
+  }
+
   try {
     const { content, date } = req.body;
     if (!content || !content.trim()) {
       return res.status(400).json({ error: '内容不能为空' });
     }
+    if (content.length > 500) {
+      return res.status(400).json({ error: '内容太长了（最多500字）' });
+    }
+
     const result = await pool.query(
       'INSERT INTO jokes (content, date, likes) VALUES ($1, $2, 0) RETURNING *',
       [content.trim(), date || new Date().toISOString().split('T')[0]]
     );
-    res.json(result.rows[0]);
+
+    res.json({ ...result.rows[0], remaining: limit.remaining });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// DELETE 删除段子
+// DELETE 删除段子（需管理员密钥）
 app.delete('/api/jokes/:id', async (req, res) => {
+  const secret = req.headers['x-admin-secret'];
+
+  if (secret !== ADMIN_SECRET) {
+    return res.status(403).json({ error: '无权删除' });
+  }
+
   try {
     const { id } = req.params;
     await pool.query('DELETE FROM jokes WHERE id = $1', [id]);

@@ -1,171 +1,230 @@
-(function () {
-  const API_BASE = 'https://selfblog-production.up.railway.app';  // Railway API
+// 段子屋 JS
+// API_BASE 必须设置为 Railway 完整 URL，不能用相对路径（GitHub Pages 无后端）
+const API_BASE = 'https://selfblog-production.up.railway.app';
 
-  // DOM
-  const jokesList = document.getElementById('jokesList');
-  const jokeInput = document.getElementById('jokeInput');
-  const postBtn = document.getElementById('postBtn');
-  const toast = document.getElementById('toast');
+// 本地缓存键
+const CACHE_KEY = 'jokes_cache';
+const CACHE_TIME_KEY = 'jokes_cache_time';
+const JOKES_CACHE_TTL = 5 * 60 * 1000; // 缓存 5 分钟
 
-  // 主题切换
-  const themeToggle = document.getElementById('themeToggle');
-  if (themeToggle) {
-    themeToggle.addEventListener('click', () => {
-      const html = document.documentElement;
-      const isDark = html.getAttribute('data-theme') === 'dark';
-      html.setAttribute('data-theme', isDark ? 'light' : 'dark');
-      localStorage.setItem('theme', isDark ? 'light' : 'dark');
-      updateThemeIcons(!isDark);
+// DOM 元素
+const list = document.getElementById('jokes-list');
+const form = document.getElementById('joke-form');
+const input = document.getElementById('joke-input');
+const toggleDark = document.getElementById('toggle-dark');
+
+// 管理员密钥（仅删除时使用，不填则不能删除）
+let adminSecret = localStorage.getItem('jokes_admin_secret') || '';
+
+// 初始化
+(async function init() {
+  // 读取缓存
+  const cached = loadCache();
+  if (cached) {
+    renderJokes(cached);
+  }
+
+  // 拉取最新
+  try {
+    const jokes = await fetchJokes();
+    saveCache(jokes);
+    renderJokes(jokes);
+  } catch (e) {
+    console.error('拉取段子失败:', e);
+  }
+
+  // 主题
+  if (localStorage.getItem('dark-mode') === '1') {
+    document.body.classList.add('dark');
+  }
+})();
+
+// 事件：发段子
+form?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const content = input.value.trim();
+  if (!content) return;
+
+  const btn = form.querySelector('button');
+  btn.disabled = true;
+  btn.textContent = '发布中...';
+
+  try {
+    const res = await fetch(API_BASE + '/api/jokes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content }),
     });
 
-    function updateThemeIcons(isDark) {
-      document.querySelectorAll('.icon-sun').forEach(el => el.style.display = isDark ? 'block' : 'none');
-      document.querySelectorAll('.icon-moon').forEach(el => el.style.display = isDark ? 'none' : 'block');
-    }
+    const data = await res.json();
 
-    const savedTheme = localStorage.getItem('theme') ||
-      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-    document.documentElement.setAttribute('data-theme', savedTheme);
-    updateThemeIcons(savedTheme === 'dark');
-  }
-
-  // Toast
-  function showToast(msg) {
-    toast.textContent = msg;
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 2500);
-  }
-
-  // 转义 HTML
-  function escapeHtml(str) {
-    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-  }
-
-  // 渲染
-  function renderJokes(jokes) {
-    if (!jokes || jokes.length === 0) {
-      jokesList.innerHTML = `
-        <div class="jokes-empty">
-          <div class="jokes-empty-icon">🤫</div>
-          <p>还没有段子，来发一条？</p>
-        </div>`;
+    if (!res.ok) {
+      if (res.status === 429) {
+        alert(`发布太频繁，请 ${data.retryAfter} 秒后再试`);
+      } else {
+        alert(data.error || '发布失败');
+      }
       return;
     }
 
-    jokesList.innerHTML = jokes.map(j => `
-      <div class="joke-card" data-id="${j.id}">
-        <div class="joke-content">${escapeHtml(j.content)}</div>
-        <div class="joke-meta">
-          <span class="joke-date">${j.date}</span>
-          <div class="joke-actions">
-            <button class="joke-delete" data-id="${j.id}" title="删除">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="3 6 5 6 21 6"></polyline>
-                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path>
-              </svg>
-            </button>
-            <button class="joke-like ${j.liked ? 'liked' : ''}" data-id="${j.id}">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="${j.liked ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
-                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-              </svg>
-              <span>${j.likes || 0}</span>
-            </button>
-          </div>
+    input.value = '';
+
+    // 成功后刷新列表
+    const jokes = await fetchJokes();
+    saveCache(jokes);
+    renderJokes(jokes);
+
+    // 显示剩余次数提示
+    if (data.remaining !== undefined && data.remaining < 5) {
+      showToast(`发布成功，本轮剩余 ${data.remaining} 次`);
+    }
+  } catch (e) {
+    alert('网络错误，请重试');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '发布';
+  }
+});
+
+// 事件：深色模式切换
+toggleDark?.addEventListener('click', () => {
+  document.body.classList.toggle('dark');
+  localStorage.setItem('dark-mode', document.body.classList.contains('dark') ? '1' : '0');
+});
+
+// --- 数据层 ---
+
+async function fetchJokes() {
+  const res = await fetch(API_BASE + '/api/jokes');
+  if (!res.ok) throw new Error('请求失败');
+  return res.json();
+}
+
+async function deleteJoke(id) {
+  // 如果还没设置密钥，提示设置
+  if (!adminSecret) {
+    adminSecret = prompt('请输入管理员密钥（删除段子用）：');
+    if (!adminSecret) return;
+    localStorage.setItem('jokes_admin_secret', adminSecret);
+  }
+
+  const res = await fetch(`${API_BASE}/api/jokes/${id}`, {
+    method: 'DELETE',
+    headers: { 'x-admin-secret': adminSecret },
+  });
+
+  if (res.status === 403) {
+    // 密钥错误，清除并重新提示
+    alert('密钥错误，无法删除');
+    adminSecret = '';
+    localStorage.removeItem('jokes_admin_secret');
+    return;
+  }
+
+  if (!res.ok) throw new Error('删除失败');
+}
+
+async function toggleLike(id) {
+  const res = await fetch(`${API_BASE}/api/jokes/${id}/like`, { method: 'POST' });
+  if (!res.ok) throw new Error('点赞失败');
+  const data = await res.json();
+
+  // 更新本地缓存中的点赞状态
+  const cached = loadCache();
+  if (cached) {
+    const joke = cached.find(j => j.id === id);
+    if (joke) {
+      joke.liked = data.liked;
+      joke.likes = data.likes;
+      saveCache(cached);
+    }
+  }
+
+  // 重新渲染
+  const jokes = await fetchJokes();
+  saveCache(jokes);
+  renderJokes(jokes);
+}
+
+// --- 渲染 ---
+
+function renderJokes(jokes) {
+  if (!list) return;
+
+  if (jokes.length === 0) {
+    list.innerHTML = '<p class="empty">还没有段子，快来抢沙发！</p>';
+    return;
+  }
+
+  list.innerHTML = jokes.map(joke => `
+    <div class="joke-card" id="joke-${joke.id}">
+      <p class="joke-content">${escapeHtml(joke.content)}</p>
+      <div class="joke-meta">
+        <span class="joke-date">${joke.date || ''}</span>
+        <div class="joke-actions">
+          <button class="like-btn ${joke.liked ? 'liked' : ''}" onclick="toggleLike(${joke.id})">
+            ${joke.liked ? '❤️' : '🤍'} ${joke.likes || 0}
+          </button>
+          <button class="delete-btn" onclick="confirmDelete(${joke.id})">🗑️</button>
         </div>
       </div>
-    `).join('');
-  }
+    </div>
+  `).join('');
+}
 
-  // 加载
-  async function loadJokes() {
-    try {
-      const res = await fetch(`${API_BASE}/api/jokes`);
-      const jokes = await res.json();
+// --- 工具 ---
+
+function confirmDelete(id) {
+  if (!confirm('确定删除这条段子？')) return;
+  deleteJoke(id).then(() => {
+    // 从缓存移除
+    const cached = loadCache();
+    if (cached) {
+      const filtered = cached.filter(j => j.id !== id);
+      saveCache(filtered);
+      renderJokes(filtered);
+    }
+    // 重新拉取确保一致
+    fetchJokes().then(jokes => {
+      saveCache(jokes);
       renderJokes(jokes);
-    } catch (err) {
-      jokesList.innerHTML = `
-        <div class="jokes-empty">
-          <div class="jokes-empty-icon">😵</div>
-          <p>加载失败，请稍后刷新重试</p>
-        </div>`;
-      console.error('加载段子失败:', err);
-    }
+    });
+  }).catch(e => {
+    alert('删除失败：' + e.message);
+  });
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function saveCache(jokes) {
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify(jokes));
+    localStorage.setItem(CACHE_TIME_KEY, Date.now().toString());
+  } catch (e) {}
+}
+
+function loadCache() {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    const time = parseInt(localStorage.getItem(CACHE_TIME_KEY) || '0');
+    if (!raw || Date.now() - time > JOKES_CACHE_TTL) return null;
+    return JSON.parse(raw);
+  } catch (e) {
+    return null;
   }
+}
 
-  // 发布
-  async function postJoke() {
-    const content = jokeInput.value.trim();
-    if (!content) return;
+function showToast(msg) {
+  const existing = document.querySelector('.toast');
+  if (existing) existing.remove();
 
-    postBtn.disabled = true;
-    postBtn.textContent = '发布中...';
-
-    try {
-      const res = await fetch(`${API_BASE}/api/jokes`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content })
-      });
-
-      if (!res.ok) throw new Error('发布失败');
-      showToast('发布成功 🎉');
-      jokeInput.value = '';
-      await loadJokes();
-    } catch (err) {
-      showToast('发布失败，请重试');
-      console.error(err);
-    } finally {
-      postBtn.disabled = false;
-      postBtn.textContent = '发布';
-    }
-  }
-
-  // 删除
-  async function handleDelete(e) {
-    const btn = e.target.closest('.joke-delete');
-    if (!btn) return;
-    if (!confirm('确定删除这条段子？')) return;
-
-    const id = btn.dataset.id;
-    try {
-      const res = await fetch(`${API_BASE}/api/jokes/${id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('删除失败');
-      btn.closest('.joke-card').remove();
-
-      if (document.querySelectorAll('.joke-card').length === 0) {
-        jokesList.innerHTML = `
-          <div class="jokes-empty">
-            <div class="jokes-empty-icon">🤫</div>
-            <p>还没有段子，来发一条？</p>
-          </div>`;
-      }
-    } catch (err) {
-      showToast('删除失败，请重试');
-      console.error(err);
-    }
-  }
-
-  // 点赞
-  async function handleLike(e) {
-    const btn = e.target.closest('.joke-like');
-    if (!btn) return;
-
-    const id = btn.dataset.id;
-    try {
-      const res = await fetch(`${API_BASE}/api/jokes/${id}/like`, { method: 'POST' });
-      const data = await res.json();
-      btn.classList.toggle('liked', data.liked === 1);
-      btn.querySelector('svg').setAttribute('fill', data.liked ? 'currentColor' : 'none');
-      btn.querySelector('span').textContent = data.likes;
-    } catch (err) {
-      console.error('点赞失败:', err);
-    }
-  }
-
-  // 事件
-  postBtn.addEventListener('click', postJoke);
-  jokesList.addEventListener('click', e => { handleLike(e); handleDelete(e); });
-  jokeInput.addEventListener('keydown', e => { if (e.key === 'Enter' && e.ctrlKey) postJoke(); });
-
-  loadJokes();
-})();
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.textContent = msg;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
