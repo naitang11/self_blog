@@ -59,6 +59,16 @@ async function initDB() {
       )
     `);
 
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS joke_likes (
+        id        SERIAL PRIMARY KEY,
+        joke_id   INTEGER NOT NULL REFERENCES jokes(id) ON DELETE CASCADE,
+        ip        TEXT    NOT NULL,
+        createdAt TIMESTAMP DEFAULT (NOW() + INTERVAL '8 hours'),
+        UNIQUE (joke_id, ip)
+      )
+    `);
+
     const res = await client.query('SELECT COUNT(*) FROM jokes');
     if (parseInt(res.rows[0].count) === 0) {
       const defaults = [
@@ -101,8 +111,22 @@ if (process.env.NODE_ENV === 'production') {
 
 // GET 所有段子（公开）
 app.get('/api/jokes', async (req, res) => {
+  const ip = getClientIp(req);
+
   try {
-    const result = await pool.query('SELECT * FROM jokes ORDER BY createdAt DESC');
+    const result = await pool.query(
+      `SELECT
+         j.id,
+         j.content,
+         j.date,
+         j.likes,
+         j.createdAt,
+         CASE WHEN jl.id IS NULL THEN 0 ELSE 1 END AS liked
+       FROM jokes j
+       LEFT JOIN joke_likes jl ON jl.joke_id = j.id AND jl.ip = $1
+       ORDER BY j.createdAt DESC`,
+      [ip]
+    );
     res.json(result.rows);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -158,19 +182,30 @@ app.delete('/api/jokes/:id', async (req, res) => {
   }
 });
 
-// POST 点赞/取消点赞
+// POST 点赞（同一 IP 对同一段子最多点赞 1 次）
 app.post('/api/jokes/:id/like', async (req, res) => {
+  const ip = getClientIp(req);
+
   try {
     const { id } = req.params;
     const jokeRes = await pool.query('SELECT * FROM jokes WHERE id = $1', [id]);
     if (jokeRes.rows.length === 0) return res.status(404).json({ error: '段子不存在' });
 
-    const joke = jokeRes.rows[0];
-    const newLiked = joke.liked ? 0 : 1;
-    const newLikes = joke.liked ? joke.likes - 1 : joke.likes + 1;
-    await pool.query('UPDATE jokes SET liked = $1, likes = $2 WHERE id = $3', [newLiked, newLikes, id]);
+    const likeRes = await pool.query(
+      'INSERT INTO joke_likes (joke_id, ip) VALUES ($1, $2) ON CONFLICT (joke_id, ip) DO NOTHING RETURNING id',
+      [id, ip]
+    );
 
-    res.json({ liked: newLiked, likes: newLikes });
+    if (likeRes.rowCount > 0) {
+      const updateRes = await pool.query(
+        'UPDATE jokes SET likes = likes + 1 WHERE id = $1 RETURNING likes',
+        [id]
+      );
+      return res.json({ liked: 1, likes: updateRes.rows[0].likes });
+    }
+
+    const currentRes = await pool.query('SELECT likes FROM jokes WHERE id = $1', [id]);
+    return res.json({ liked: 1, likes: currentRes.rows[0].likes, message: '你已经点过赞了' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
