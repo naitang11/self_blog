@@ -182,7 +182,7 @@ app.delete('/api/jokes/:id', async (req, res) => {
   }
 });
 
-// POST 点赞（同一 IP 对同一段子最多点赞 1 次）
+// POST 点赞/取消点赞（同一 IP 对同一段子二次点击可取消）
 app.post('/api/jokes/:id/like', async (req, res) => {
   const ip = getClientIp(req);
 
@@ -191,21 +191,26 @@ app.post('/api/jokes/:id/like', async (req, res) => {
     const jokeRes = await pool.query('SELECT * FROM jokes WHERE id = $1', [id]);
     if (jokeRes.rows.length === 0) return res.status(404).json({ error: '段子不存在' });
 
-    const likeRes = await pool.query(
-      'INSERT INTO joke_likes (joke_id, ip) VALUES ($1, $2) ON CONFLICT (joke_id, ip) DO NOTHING RETURNING id',
+    const existedRes = await pool.query(
+      'SELECT id FROM joke_likes WHERE joke_id = $1 AND ip = $2 LIMIT 1',
       [id, ip]
     );
 
-    if (likeRes.rowCount > 0) {
+    if (existedRes.rowCount > 0) {
+      await pool.query('DELETE FROM joke_likes WHERE joke_id = $1 AND ip = $2', [id, ip]);
       const updateRes = await pool.query(
-        'UPDATE jokes SET likes = likes + 1 WHERE id = $1 RETURNING likes',
+        'UPDATE jokes SET likes = GREATEST(likes - 1, 0) WHERE id = $1 RETURNING likes',
         [id]
       );
-      return res.json({ liked: 1, likes: updateRes.rows[0].likes });
+      return res.json({ liked: 0, likes: updateRes.rows[0].likes });
     }
 
-    const currentRes = await pool.query('SELECT likes FROM jokes WHERE id = $1', [id]);
-    return res.json({ liked: 1, likes: currentRes.rows[0].likes, message: '你已经点过赞了' });
+    await pool.query('INSERT INTO joke_likes (joke_id, ip) VALUES ($1, $2)', [id, ip]);
+    const updateRes = await pool.query(
+      'UPDATE jokes SET likes = likes + 1 WHERE id = $1 RETURNING likes',
+      [id]
+    );
+    return res.json({ liked: 1, likes: updateRes.rows[0].likes });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
