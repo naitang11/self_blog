@@ -281,7 +281,7 @@ const API_BASE = 'https://selfblog-production.up.railway.app';
     tags: ['故事'],
     readTime: '1 分钟',
     prev: 5,
-    next: null,
+    next: 7,
     content: `
 # 最后一片叶子
 
@@ -303,6 +303,31 @@ const API_BASE = 'https://selfblog-production.up.railway.app';
 
 ---
 *首发于 2026-04-10*
+    `
+  },
+  7: {
+    id: 7,
+    title: '程序员小王的一天',
+    date: '2026-04-14',
+    tags: ['故事', '日常'],
+    readTime: '1 分钟',
+    prev: 6,
+    next: null,
+    content: `
+# 程序员小王的一天
+
+早上到公司，发现服务器挂了。
+
+联系运维，运维说网络问题。
+联系网络，网络说服务器问题。
+联系机房，机房说欠费了。
+
+小王交完钱，服务器好了。
+
+这一天，小王主要干了三件事：背锅、催款、写周报。
+
+---
+*首发于 2026-04-14*
     `
   }
 };
