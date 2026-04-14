@@ -8,10 +8,11 @@ const CACHE_TIME_KEY = 'jokes_cache_time';
 const JOKES_CACHE_TTL = 5 * 60 * 1000; // 缓存 5 分钟
 
 // DOM 元素
-const list = document.getElementById('jokes-list');
-const form = document.getElementById('joke-form');
-const input = document.getElementById('joke-input');
-const toggleDark = document.getElementById('toggle-dark');
+const list = document.getElementById('jokesList') || document.getElementById('jokes-list');
+const form = document.getElementById('jokeForm') || document.getElementById('joke-form');
+const input = document.getElementById('jokeInput') || document.getElementById('joke-input');
+const postBtn = document.getElementById('postBtn') || (form ? form.querySelector('button') : null);
+const toggleDark = document.getElementById('themeToggle') || document.getElementById('toggle-dark');
 
 // 管理员密钥（仅删除时使用，不填则不能删除）
 let adminSecret = localStorage.getItem('jokes_admin_secret') || '';
@@ -40,12 +41,13 @@ let adminSecret = localStorage.getItem('jokes_admin_secret') || '';
 })();
 
 // 事件：发段子
-form?.addEventListener('submit', async (e) => {
-  e.preventDefault();
+async function submitJoke() {
   const content = input.value.trim();
   if (!content) return;
 
-  const btn = form.querySelector('button');
+  const btn = postBtn;
+  if (!btn) return;
+
   btn.disabled = true;
   btn.textContent = '发布中...';
 
@@ -84,6 +86,16 @@ form?.addEventListener('submit', async (e) => {
     btn.disabled = false;
     btn.textContent = '发布';
   }
+}
+
+form?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  await submitJoke();
+});
+
+postBtn?.addEventListener('click', async (e) => {
+  e.preventDefault();
+  await submitJoke();
 });
 
 // 事件：深色模式切换
