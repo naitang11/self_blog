@@ -1,4 +1,4 @@
-const ARTICLE_INDEX_PATH = 'articles/index.json';
+const ARTICLE_DETAIL_INDEX_PATH = 'articles/index.json';
 
 function onDOMReady(fn) {
     if (document.readyState === 'loading') {
@@ -141,7 +141,7 @@ function renderArticle(meta, markdown, prev, next) {
 async function loadArticleDetail() {
     const id = getArticleId();
 
-    const articleList = await fetchJson(ARTICLE_INDEX_PATH);
+    const articleList = await fetchJson(ARTICLE_DETAIL_INDEX_PATH);
     const sortedArticles = Array.isArray(articleList)
         ? [...articleList].sort((a, b) => a.id - b.id)
         : [];
