@@ -23,4 +23,21 @@ type: feedback
 - 加载中的提示已消失。
 - 控制台不再出现错误。
 
+
+
+## 新出现问题（2026-04-18）
+- 现象：文章页再次出现一直显示“加载中...”，内容不渲染。
+- 触发条件：`article.html` 同时加载了 `js/app.js` 和 `js/article.js`，两个脚本都声明了同名全局常量 `ARTICLE_INDEX_PATH`。
+- 浏览器报错：`Uncaught SyntaxError: Identifier 'ARTICLE_INDEX_PATH' has already been declared`。
+
+## 新问题修复措施
+1. 将 `js/article.js` 中的常量改名为 `ARTICLE_DETAIL_INDEX_PATH`，避免与首页脚本冲突。
+2. 同步替换文章索引读取逻辑中的变量引用。
+3. 复查相关文件语法与诊断，确认无新增报错。
+
+## 新问题修复结果
+- 文章页初始化逻辑恢复执行，不再卡在“加载中...”。
+- `article.html?id=1` 到 `article.html?id=9` 可正常显示。
+- 控制台未再出现重复声明错误。
+
 *报告结束*

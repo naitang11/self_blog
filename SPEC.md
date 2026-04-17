@@ -45,14 +45,15 @@
 
 ### 3.1 首页 (`index.html`)
 
-- 展示文章列表（来自 `articles.js` 全局变量）
+- 展示文章列表（运行时读取 `articles/index.json`）
 - 搜索：按标题 / 摘要 / 标签做前端过滤
 - 显示统计：文章数、标签数
 - 主题切换：`data-theme` + `localStorage('theme')`
 
 ### 3.2 文章页 (`article.html`)
 
-- 通过 `id` 读取 `js/article.js` 中内置 `ARTICLES` 数据
+- 通过 `id` 读取 `articles/index.json` 元数据
+- 按 `id` 读取 `articles/{id}.md` 正文并渲染
 - Markdown 渲染 + 代码高亮
 - 显示元信息（日期、阅读时间、标签）
 - 支持上一篇 / 下一篇导航
@@ -85,10 +86,17 @@
 
 ### 4.1 文章数据（前端静态）
 
-当前采用 JS 常量数据源，而非运行时读取 `articles/*.md`：
+当前采用“索引 + 正文分离”的静态内容方案：
 
-- 列表：`articles.js` 中 `const articles = [...]`
-- 详情：`js/article.js` 中 `const ARTICLES = {...}`
+- 列表/元数据：`articles/index.json`
+- 正文：`articles/{id}.md`
+- 详情页渲染逻辑：`js/article.js`
+
+`articles.js` 的存在意义：
+
+- 历史兼容文件，保留给旧流程或手动调试时使用。
+- 管理页导出功能会生成同名 JS 文件（导出产物），便于在纯前端场景快速分发。
+- 当前主站运行时不再依赖仓库内的 `articles.js` 作为主数据源。
 
 文章字段示例：
 
@@ -161,7 +169,7 @@
 
 ### 6.3 未实现或暂缓
 
-- 基于 `articles/*.md` + front-matter + `articles/index.json` 的运行时加载
+- front-matter 自动解析与构建期索引生成（当前仍以手动维护 `articles/index.json` 为主）
 - Electron 打包与桌面端文章管理
 - 图片懒加载、首屏 CSS 内联、长列表虚拟滚动
 
@@ -169,7 +177,7 @@
 
 ## 7. 已知问题与一致性差异
 
-1. 文章数据存在双源维护（`articles.js` 与 `js/article.js`），有同步成本。
+1. 文档与历史脚本仍有旧方案描述（`articles.js` 全局变量 / 内置 `ARTICLES`），需要持续清理。
 2. 内容文案中仍有“SQLite”描述，但后端实际已是 PostgreSQL。
 3. 测试脚本中的标签选择器与当前标签值可能不一致（例如“全部”与 `data-tag="all"`）。
 
@@ -177,12 +185,12 @@
 
 ## 8. 后续迭代建议
 
-1. 统一文章数据源（优先保留一种，避免重复维护）。
+1. 固化文章内容流程：仅维护 `articles/index.json` 与 `articles/{id}.md`。
 2. 恢复并接入文章页目录、评论、阅读进度逻辑（可参考历史 `article_fixed.js`）。
 3. 统一全站主题存储策略，减少页面间行为差异。
-4. 决策是否继续走“纯静态导出”路线，还是恢复 `md + index.json` 内容流水线。
+4. 评估是否保留仓库内 `articles.js`；若保留，需在文件头标注“非主数据源”。
 5. 补充最小回归测试：主页渲染、文章加载、段子 API 可用性。
 
 ---
 
-_最后更新：2026-04-15_
+_最后更新：2026-04-18_
