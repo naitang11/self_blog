@@ -69,6 +69,10 @@ const articles = [
     "date": "2026-04-17",
     "tags": ["故事"],
     "excerpt": "时间无情第一，它才不在乎你是否还是一个孩子，你只要稍一耽搁、稍一犹豫，它立马帮你决定故事的结局。",
+<<<<<<< HEAD
     "readTime": "5 min"
+=======
+    "readTime": "6 min"
+>>>>>>> 39786e6f5c25cb8347b8fea1f2cd15f2f4d0f448
   }
 ];
