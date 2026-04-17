@@ -1,5 +1,13 @@
-// 文章数据（从全局 articles.js 加载）
-// loadArticles 从 articles.js 全局变量读取文章列表
+const ARTICLE_INDEX_PATH = 'articles/index.json';
+let articleData = [];
+
+async function fetchArticleIndex() {
+    const response = await fetch(ARTICLE_INDEX_PATH, { cache: 'no-store' });
+    if (!response.ok) {
+        throw new Error(`加载文章索引失败: ${response.status}`);
+    }
+    return response.json();
+}
 
 function getArticleListEl() {
     return document.getElementById('articlesGrid') || document.getElementById('article-list');
@@ -41,27 +49,36 @@ function renderArticles(items) {
 
 function updateHomeStats() {
     const articleCountEl = document.getElementById('articleCount');
-    if (articleCountEl) articleCountEl.textContent = String(articles.length);
+    if (articleCountEl) articleCountEl.textContent = String(articleData.length);
 
     const tagCountEl = document.getElementById('tagCount');
     if (tagCountEl) {
         const tagSet = new Set();
-        articles.forEach(article => article.tags.forEach(tag => tagSet.add(tag)));
+        articleData.forEach(article => article.tags.forEach(tag => tagSet.add(tag)));
         tagCountEl.textContent = String(tagSet.size);
     }
 }
 
-// 从全局 articles.js 变量获取文章列表
-function loadArticles() {
-    if (!Array.isArray(articles)) return;
-    renderArticles(articles);
+function showLoadError() {
+    const list = getArticleListEl();
+    if (!list) return;
+
+    list.innerHTML = '<div class="empty">文章列表加载失败，请稍后重试</div>';
+    const filteredCountEl = document.getElementById('filteredCount');
+    if (filteredCountEl) filteredCountEl.textContent = '0';
+}
+
+async function loadArticles() {
+    const loaded = await fetchArticleIndex();
+    articleData = Array.isArray(loaded) ? loaded : [];
+    renderArticles(articleData);
     updateHomeStats();
 }
 
 // 搜索功能
 function searchArticles(query) {
-    if (!Array.isArray(articles)) return;
-    const filtered = articles.filter(a =>
+    if (!Array.isArray(articleData)) return;
+    const filtered = articleData.filter(a =>
         a.title.includes(query) || a.excerpt.includes(query) || a.tags.some(t => t.includes(query))
     );
     renderArticles(filtered);
@@ -133,10 +150,17 @@ function setupThemeToggle() {
 }
 
 // 初始化
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const savedTheme = localStorage.getItem('theme') || 'light';
     setTheme(savedTheme);
-    loadArticles();
+
+    try {
+        await loadArticles();
+    } catch (error) {
+        showLoadError();
+        console.error('loadArticles error:', error);
+    }
+
     setupSearch();
     setupArticleCardNavigation();
     setupThemeToggle();
