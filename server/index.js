@@ -94,6 +94,19 @@ async function initDB() {
       )
     `);
 
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS photos (
+        id         SERIAL PRIMARY KEY,
+        url        TEXT NOT NULL,
+        public_id  TEXT,
+        filename   TEXT NOT NULL,
+        date       TEXT NOT NULL,
+        width      INTEGER,
+        height     INTEGER,
+        createdAt  TIMESTAMP DEFAULT (NOW() + INTERVAL '8 hours')
+      )
+    `);
+
     const res = await client.query('SELECT COUNT(*) FROM jokes');
     if (parseInt(res.rows[0].count) === 0) {
       const defaults = [
@@ -242,6 +255,83 @@ app.post('/api/jokes/:id/like', async (req, res) => {
 });
 
 // --- 图片上传 API ---
+
+// 获取所有图片
+app.get('/api/photos', async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT id, url, public_id, filename, date, width, height, createdAt FROM photos ORDER BY createdAt DESC'
+    );
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 保存图片信息
+app.post('/api/photos', async (req, res) => {
+  try {
+    const { url, public_id, filename, date, width, height } = req.body;
+
+    if (!url || !filename) {
+      return res.status(400).json({ error: '缺少必要字段' });
+    }
+
+    const result = await pool.query(
+      `INSERT INTO photos (url, public_id, filename, date, width, height)
+       VALUES ($1, $2, $3, $4, $5, $6)
+       RETURNING id, url, public_id, filename, date, width, height, createdAt`,
+      [
+        url,
+        public_id || null,
+        filename,
+        date || new Date().toISOString().split('T')[0],
+        Number.isInteger(width) ? width : null,
+        Number.isInteger(height) ? height : null,
+      ]
+    );
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 删除图片（需管理员密钥）
+app.delete('/api/photos/:id', async (req, res) => {
+  const secret = req.headers['x-admin-secret'];
+
+  if (secret !== ADMIN_SECRET) {
+    return res.status(403).json({ error: '无权删除' });
+  }
+
+  try {
+    const { id } = req.params;
+    const photoRes = await pool.query(
+      'SELECT id, public_id FROM photos WHERE id = $1 LIMIT 1',
+      [id]
+    );
+
+    if (photoRes.rowCount === 0) {
+      return res.status(404).json({ error: '图片不存在' });
+    }
+
+    const photo = photoRes.rows[0];
+
+    if (photo.public_id && process.env.CLOUDINARY_CLOUD_NAME) {
+      try {
+        await cloudinary.uploader.destroy(photo.public_id);
+      } catch (cloudErr) {
+        console.error('[Cloudinary] 删除失败:', cloudErr.message);
+      }
+    }
+
+    await pool.query('DELETE FROM photos WHERE id = $1', [id]);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 app.post('/api/upload', upload.single('image'), async (req, res) => {
   if (!req.file) {
