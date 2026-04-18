@@ -40,4 +40,23 @@ type: feedback
 - `article.html?id=1` 到 `article.html?id=9` 可正常显示。
 - 控制台未再出现重复声明错误。
 
+## 新出现问题（2026-04-18，图片集）
+- 现象：访问图片集页面时，前端提示“加载图片失败”，控制台出现 404。
+- 报错信息：`Failed to load resource: the server responded with a status of 404`。
+- 触发位置：`photos.js` 在初始化阶段调用 `loadPhotos()` 请求 `/api/photos`。
+- 根本原因：后端仅实现了 `/api/upload`，未实现 `/api/photos` 的列表、保存、删除接口，导致前端请求必然 404。
+
+## 新问题修复措施（图片集）
+1. 在 `server/index.js` 的数据库初始化中新增 `photos` 表（含 `url`、`public_id`、`filename`、`date`、`width`、`height`、`createdAt` 字段）。
+2. 新增 `GET /api/photos`：按创建时间倒序返回图片列表，供页面初始化加载使用。
+3. 新增 `POST /api/photos`：保存上传后图片元信息，返回保存结果。
+4. 新增 `DELETE /api/photos/:id`：校验管理员密钥后删除数据库记录；若存在 `public_id` 且已配置 Cloudinary，则同步尝试删除云端图片。
+5. 完成修改后执行语法/诊断检查，确认相关文件无新增错误。
+
+## 新问题修复结果（图片集）
+- 图片集页面不再因 `/api/photos` 缺失而返回 404。
+- 前端 `loadPhotos()` 可正常获取数据（空列表或已有图片列表）。
+- 上传后图片信息可落库，删除流程可走通。
+- 相关改动已进入当前工作区待提交状态。
+
 *报告结束*
