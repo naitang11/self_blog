@@ -4,7 +4,7 @@ const API_BASE = window.location.hostname === 'localhost' || window.location.hos
   ? 'http://localhost:3001'
   : 'https://selfblog-production.up.railway.app';
 
-// 图片数据（内存存储，上传时添加到数组）
+// 图片数据（从 API 加载）
 let photos = [];
 let currentIndex = 0;
 
@@ -108,18 +108,28 @@ async function handleUpload(file) {
 
     const data = await res.json();
 
-    // 添加到本地数据
-    const photo = {
-      id: Date.now(),
-      url: data.url,
-      public_id: data.public_id || null,
-      filename: file.name,
-      date: getToday(),
-      width: data.width,
-      height: data.height,
-    };
-    photos.unshift(photo);
-    savePhotos();
+    // 保存到数据库
+    const saveRes = await fetch(`${API_BASE}/api/photos`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        url: data.url,
+        public_id: data.public_id || null,
+        filename: file.name,
+        date: getToday(),
+        width: data.width,
+        height: data.height,
+      }),
+    });
+
+    if (!saveRes.ok) {
+      throw new Error('保存图片信息失败');
+    }
+
+    const savedPhoto = await saveRes.json();
+
+    // 添加到列表
+    photos.unshift(savedPhoto);
     renderPhotos();
 
     uploadStatus.innerHTML = '✅ 上传成功！';
@@ -142,22 +152,14 @@ async function handleUpload(file) {
 
 // ==================== 照片管理 ====================
 
-function loadPhotos() {
+async function loadPhotos() {
   try {
-    const saved = localStorage.getItem('blog_photos');
-    if (saved) {
-      photos = JSON.parse(saved);
-    }
+    const res = await fetch(`${API_BASE}/api/photos`);
+    if (!res.ok) throw new Error('获取图片失败');
+    photos = await res.json();
   } catch (e) {
     console.error('加载图片失败:', e);
-  }
-}
-
-function savePhotos() {
-  try {
-    localStorage.setItem('blog_photos', JSON.stringify(photos));
-  } catch (e) {
-    console.error('保存图片失败:', e);
+    showToast('加载图片失败', 'error');
   }
 }
 
@@ -208,20 +210,18 @@ async function deletePhoto(index) {
   if (!confirm('确定要删除这张图片吗？')) return;
 
   try {
-    // 如果有 public_id，尝试从 Cloudinary 删除
-    if (photo.public_id) {
-      const res = await fetch(`${API_BASE}/api/upload/${photo.public_id}`, {
-        method: 'DELETE',
-        headers: { 'x-admin-secret': prompt('请输入管理员密钥：') || '' },
-      });
-      if (!res.ok && res.status !== 400) {
-        // 400 表示未配置 Cloudinary，非致命错误
-        throw new Error('删除失败');
-      }
+    const adminSecret = prompt('请输入管理员密钥：') || '';
+    const res = await fetch(`${API_BASE}/api/photos/${photo.id}`, {
+      method: 'DELETE',
+      headers: { 'x-admin-secret': adminSecret },
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || '删除失败');
     }
 
     photos.splice(index, 1);
-    savePhotos();
     renderPhotos();
     showToast('已删除');
   } catch (err) {
@@ -312,9 +312,9 @@ $('themeToggle').addEventListener('click', () => {
 
 // ==================== 初始化 ====================
 
-function init() {
+async function init() {
   initTheme();
-  loadPhotos();
+  await loadPhotos();
   renderPhotos();
   initUpload();
   initLightbox();
