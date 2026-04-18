@@ -78,5 +78,11 @@
     "tags": ["故事"],
     "excerpt": "教堂的钟楼里住着一个老人。一百年来，那座钟从未停过。镇上的一切，都刻在它的摆动里。",
     "readTime": "1 min"
+  {
+    "id": 10,
+    "title": "PostgreSQL vs MySQL：专业角度深度对比",
+    "date": "2026-04-18",
+    "tags": ["数据库", "PostgreSQL", "MySQL"],
+    "filename": "10.md"
   }
 ]

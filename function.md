@@ -26,8 +26,11 @@
 
 | 方法 | 路径 | 描述 | 认证 |
 |------|------|------|------|
-| POST | `/api/upload` | 上传图片 | 无 |
-| DELETE | `/api/upload/:publicId` | 删除图片 | 需管理员密钥 |
+| GET | `/api/photos` | 获取图片列表 | 无 |
+| POST | `/api/photos` | 保存图片元数据 | 无 |
+| DELETE | `/api/photos/:id` | 删除图片元数据 | 需管理员密钥 |
+| POST | `/api/upload` | 上传图片到 Cloudinary | 无 |
+| DELETE | `/api/upload/:publicId` | 删除 Cloudinary 图片 | 需管理员密钥 |
 
 ### 请求示例
 
@@ -64,11 +67,25 @@ curl -X POST https://selfblog-production.up.railway.app/api/upload \
 - [x] 响应式布局
 - [x] 主题切换适配
 
+### 数据库表
+
+**photos**
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| id | SERIAL | 主键 |
+| url | TEXT | Cloudinary 图片 URL |
+| public_id | VARCHAR | Cloudinary 资源 ID |
+| filename | VARCHAR | 文件名 |
+| date | DATE | 上传日期 |
+| width | INTEGER | 图片宽度 |
+| height | INTEGER | 图片高度 |
+| created_at | TIMESTAMP | 创建时间 |
+
 ### 数据存储
-- **元数据**：LocalStorage（本地浏览器）
+- **元数据**：PostgreSQL 数据库（Railway）— 所有设备同步共享
 - **图片文件**：Cloudinary CDN
 
-> 注意：元数据存储在浏览器 LocalStorage 中，清除浏览器缓存会导致数据丢失。图片文件本身存储在 Cloudinary，不受影响。
+> 注意：元数据存储在 Railway PostgreSQL 中，支持多设备同步访问。
 
 ### 相关链接
 - Cloudinary 控制台：https://cloudinary.com/console
