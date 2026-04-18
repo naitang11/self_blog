@@ -2,7 +2,7 @@
 
 const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
   ? 'http://localhost:3001'
-  : '';
+  : 'https://selfblog-production.up.railway.app';
 
 // 图片数据（内存存储，上传时添加到数组）
 let photos = [];
