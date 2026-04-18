@@ -2,6 +2,9 @@ const express = require('express');
 const { Pool } = require('pg');
 const cors = require('cors');
 const path = require('path');
+const multer = require('multer');
+const cloudinary = require('cloudinary').v2;
+const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -43,6 +46,28 @@ function getClientIp(req) {
 }
 
 console.log('📦 数据库: PostgreSQL (Railway)');
+
+// Cloudinary 配置
+if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET) {
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+  });
+  console.log('[Cloudinary] 已配置');
+} else {
+  console.log('[Cloudinary] 未配置，请设置环境变量');
+}
+
+// Multer 配置（临时存储上传文件）
+const uploadDir = '/tmp/uploads/';
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+const upload = multer({
+  dest: uploadDir,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+});
 
 // 初始化表
 async function initDB() {
@@ -213,6 +238,61 @@ app.post('/api/jokes/:id/like', async (req, res) => {
     return res.json({ liked: 1, likes: updateRes.rows[0].likes });
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+// --- 图片上传 API ---
+
+app.post('/api/upload', upload.single('image'), async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: '没有上传文件' });
+  }
+
+  if (!process.env.CLOUDINARY_CLOUD_NAME) {
+    // 没配置 Cloudinary 时返回本地路径（仅开发用）
+    return res.json({
+      url: `/api/uploads/${req.file.filename}`,
+      filename: req.file.originalname,
+    });
+  }
+
+  try {
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: 'blog_photos',
+      resource_type: 'image',
+    });
+
+    // 上传成功后删除本地临时文件
+    fs.unlinkSync(req.file.path);
+
+    res.json({
+      url: result.secure_url,
+      public_id: result.public_id,
+      width: result.width,
+      height: result.height,
+    });
+  } catch (err) {
+    console.error('[Cloudinary] 上传失败:', err.message);
+    res.status(500).json({ error: '上传失败: ' + err.message });
+  }
+});
+
+// 删除图片
+app.delete('/api/upload/:publicId', async (req, res) => {
+  const secret = req.headers['x-admin-secret'];
+  if (secret !== ADMIN_SECRET) {
+    return res.status(403).json({ error: '无权删除' });
+  }
+
+  if (!process.env.CLOUDINARY_CLOUD_NAME) {
+    return res.status(400).json({ error: '未配置 Cloudinary' });
+  }
+
+  try {
+    await cloudinary.uploader.destroy(req.params.publicId);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: '删除失败' });
   }
 });
 

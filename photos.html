@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>图片集 - 段子屋</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/photos.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="progress-bar" id="progressBar"></div>
+  <nav class="navbar" id="navbar">
+    <div class="navbar-inner">
+      <a href="index.html" class="nav-logo">← 返回首页</a>
+      <button class="theme-toggle" id="themeToggle" aria-label="切换主题">
+        <span class="theme-icon">🌙</span>
+      </button>
+    </div>
+  </nav>
+
+  <main class="main-content" style="padding-top: 96px;">
+    <div class="container">
+      <header class="page-header">
+        <h1>📷 图片集</h1>
+        <p class="subtitle">记录生活的点点滴滴</p>
+      </header>
+
+      <!-- 上传区域 -->
+      <section class="upload-section" id="uploadSection">
+        <div class="upload-zone" id="uploadZone">
+          <div class="upload-hint">
+            <span class="upload-icon">📤</span>
+            <p>点击或拖拽图片到这里上传</p>
+            <p class="upload-limit">支持 JPG、PNG、WebP，最大 10MB</p>
+          </div>
+          <input type="file" id="fileInput" accept="image/*" hidden>
+        </div>
+        <div class="upload-status" id="uploadStatus"></div>
+      </section>
+
+      <!-- 图片网格 -->
+      <section class="gallery-section">
+        <div class="gallery-header">
+          <h2>全部图片</h2>
+          <span class="photo-count" id="photoCount">0 张</span>
+        </div>
+        <div class="photo-grid" id="photoGrid">
+          <!-- 图片卡片会动态插入 -->
+        </div>
+        <div class="empty-state" id="emptyState">
+          <span class="empty-icon">🖼️</span>
+          <p>还没有图片，上传一张吧</p>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- 图片预览弹窗 -->
+  <div class="lightbox" id="lightbox">
+    <button class="lightbox-close" id="lightboxClose">×</button>
+    <button class="lightbox-nav lightbox-prev" id="lightboxPrev">‹</button>
+    <button class="lightbox-nav lightbox-next" id="lightboxNext">›</button>
+    <img class="lightbox-img" id="lightboxImg" src="" alt="">
+    <div class="lightbox-info" id="lightboxInfo"></div>
+  </div>
+
+  <!-- 提示弹窗 -->
+  <div class="toast" id="toast"></div>
+
+  <script src="js/photos.js"></script>
+</body>
+</html>
