@@ -170,7 +170,7 @@ async function initArticlePage() {
 
 onDOMReady(initArticlePage);
 
-const articleData = {
+const articleMeta = {
   1: {title: "我的博客诞生记", date: "2026-04-08"},
   2: {title: "用 Vanilla JS 搭博客：比框架更自由的体验", date: "2026-04-08"},
   3: {title: "程序员书单：那些改变我思维的书", date: "2026-04-08"},
