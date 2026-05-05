@@ -69,52 +69,96 @@
   opacity: 0.7;
 }
 
-/* ===== 文章正文 ===== */
+/* ===== 文章正文排版 ===== */
 .article-body {
   font-size: 17px;
-  line-height: 1.85;
+  line-height: 1.9;
   color: var(--text);
+  word-break: break-word;
 }
 
+/* 首段放大 —— 杂志风 */
+.article-body > p:first-of-type {
+  font-size: 1.15em;
+  color: var(--text-secondary);
+  line-height: 1.85;
+  margin-bottom: 2em;
+  padding-bottom: 1.5em;
+  border-bottom: 1px dashed var(--border);
+}
+
+/* ===== 标题层级 ===== */
 .article-body h1,
 .article-body h2,
 .article-body h3,
 .article-body h4 {
   font-family: var(--font-serif);
-  margin-top: 2em;
-  margin-bottom: 0.75em;
+  margin-top: 2.2em;
+  margin-bottom: 0.8em;
   line-height: 1.4;
   color: var(--text);
+  position: relative;
 }
 
+/* h2 —— 左侧色条 */
 .article-body h2 {
-  font-size: 1.6rem;
-  padding-bottom: 8px;
+  font-size: 1.55rem;
+  padding-left: 16px;
+  padding-bottom: 6px;
+  border-left: 4px solid var(--accent);
   border-bottom: 1px solid var(--border);
 }
 
+/* h3 —— 带装饰点 */
 .article-body h3 {
   font-size: 1.3rem;
+  padding-left: 20px;
+}
+
+.article-body h3::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.35em;
+  width: 8px;
+  height: 8px;
+  background: var(--accent);
+  border-radius: 50%;
 }
 
 .article-body h4 {
   font-size: 1.1rem;
+  color: var(--text-secondary);
 }
 
+/* ===== 段落 ===== */
 .article-body p {
-  margin-bottom: 1.5em;
+  margin-bottom: 1.6em;
 }
 
+/* ===== 链接 ===== */
 .article-body a {
   color: var(--accent);
-  text-decoration: underline;
+  text-decoration: none;
+  background-image: linear-gradient(var(--accent), var(--accent));
+  background-size: 100% 1px;
+  background-position: 0 1.15em;
+  background-repeat: no-repeat;
   text-underline-offset: 3px;
+  transition: background-size 0.2s;
 }
 
 .article-body a:hover {
-  color: var(--accent-hover);
+  background-size: 100% 2px;
 }
 
+/* ===== 加粗强调 ===== */
+.article-body strong {
+  color: var(--text);
+  font-weight: 700;
+}
+
+/* ===== 列表 ===== */
 .article-body ul,
 .article-body ol {
   margin-bottom: 1.5em;
@@ -123,45 +167,77 @@
 
 .article-body li {
   margin-bottom: 0.5em;
+  padding-left: 2px;
 }
 
+.article-body li::marker {
+  color: var(--accent);
+}
+
+/* ===== 引用块重设计 ===== */
 .article-body blockquote {
-  margin: 1.5em 0;
-  padding: 16px 24px;
+  margin: 2em 0;
+  padding: 24px 28px 24px 60px;
   border-left: 4px solid var(--accent);
-  background: var(--accent-bg);
+  background: var(--card);
   border-radius: 0 var(--radius) var(--radius) 0;
   color: var(--text-secondary);
   font-style: italic;
+  position: relative;
+  box-shadow: var(--shadow);
+}
+
+.article-body blockquote::before {
+  content: '❝';
+  position: absolute;
+  left: 18px;
+  top: 8px;
+  font-size: 28px;
+  color: var(--accent);
+  font-style: normal;
+  line-height: 1;
+  opacity: 0.6;
 }
 
 .article-body blockquote p:last-child {
   margin-bottom: 0;
 }
 
+/* ===== 代码块 ===== */
 .article-body pre {
-  margin: 1.5em 0;
-  padding: 20px;
-  background: var(--card);
-  border: 1px solid var(--border);
+  margin: 1.8em 0;
   border-radius: var(--radius);
-  overflow-x: auto;
-  font-size: 14px;
-  line-height: 1.6;
+  overflow: hidden;
+  box-shadow: var(--shadow);
 }
 
-.article-body code {
+.article-body pre code {
+  display: block;
+  padding: 20px 24px;
+  background: #1E1E2E;
+  color: #CDD6F4;
   font-family: var(--font-mono);
-  font-size: 0.9em;
+  font-size: 14px;
+  line-height: 1.7;
+  overflow-x: auto;
 }
 
+[data-theme="light"] .article-body pre code {
+  background: #F5F5F5;
+  color: #24292E;
+}
+
+/* 行内代码 */
 .article-body :not(pre) > code {
-  padding: 2px 6px;
+  padding: 2px 7px;
   background: var(--accent-bg);
   color: var(--accent);
   border-radius: var(--radius-sm);
+  font-size: 0.88em;
+  font-family: var(--font-mono);
 }
 
+/* ===== 图片 ===== */
 .article-body img {
   max-width: 100%;
   margin: 2em auto;
@@ -169,39 +245,77 @@
   box-shadow: var(--shadow-md);
 }
 
+/* ===== 分割线 ===== */
 .article-body hr {
-  margin: 2.5em 0;
+  margin: 2.8em 0;
   border: none;
-  border-top: 1px solid var(--border);
+  text-align: center;
+  overflow: visible;
+  height: 0;
 }
 
+.article-body hr::after {
+  content: '·  ·  ·';
+  display: inline-block;
+  color: var(--text-secondary);
+  font-size: 18px;
+  letter-spacing: 8px;
+  position: relative;
+  top: -0.5em;
+}
+
+/* ===== 表格美化 ===== */
 .article-body table {
   width: 100%;
-  margin: 1.5em 0;
-  border-collapse: collapse;
+  margin: 1.8em 0;
+  border-collapse: separate;
+  border-spacing: 0;
   font-size: 15px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
 }
 
-.article-body th,
-.article-body td {
-  padding: 12px 16px;
-  border: 1px solid var(--border);
-  text-align: left;
-}
-
-.article-body th {
-  background: var(--card);
+.article-body thead th {
+  background: var(--accent);
+  color: #fff;
   font-weight: 600;
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 14px;
+  letter-spacing: 0.02em;
 }
 
-.article-body tr:nth-child(even) {
+.article-body thead th:first-child {
+  border-radius: var(--radius) 0 0 0;
+}
+
+.article-body thead th:last-child {
+  border-radius: 0 var(--radius) 0 0;
+}
+
+.article-body tbody td {
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--border);
   background: var(--card);
+}
+
+.article-body tbody tr:last-child td:first-child {
+  border-radius: 0 0 0 var(--radius);
+}
+
+.article-body tbody tr:last-child td:last-child {
+  border-radius: 0 0 var(--radius) 0;
+}
+
+.article-body tbody tr:hover td {
+  background: var(--accent-bg);
 }
 
 /* ===== 代码高亮优化 ===== */
 .article-body pre code.hljs {
-  padding: 0;
-  background: transparent;
+  padding: 20px 24px;
+  background: inherit;
 }
 
 /* ===== 侧边目录 ===== */
@@ -498,15 +612,16 @@
     font-size: 16px;
   }
 
+  .article-body blockquote {
+    padding: 18px 20px 18px 44px;
+  }
+
+  .article-body blockquote::before {
+    left: 10px;
+    font-size: 22px;
+  }
+
   .article-nav {
     grid-template-columns: 1fr;
-  }
-
-  .comment-form-footer {
-    flex-direction: column;
-  }
-
-  .comment-author {
-    max-width: none;
   }
 }
