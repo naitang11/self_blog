@@ -169,3 +169,18 @@ async function initArticlePage() {
 }
 
 onDOMReady(initArticlePage);
+
+const articleData = {
+  1: {title: "我的博客诞生记", date: "2026-04-08"},
+  2: {title: "用 Vanilla JS 搭博客：比框架更自由的体验", date: "2026-04-08"},
+  3: {title: "程序员书单：那些改变我思维的书", date: "2026-04-08"},
+  4: {title: "从零搭个人博客：我都干了什么", date: "2026-04-09"},
+  5: {title: "段子书屋的技术内幕", date: "2026-04-10"},
+  6: {title: "最后一片叶子", date: "2026-04-10"},
+  7: {title: "程序员小王的一天", date: "2026-04-14"},
+  8: {title: "乌鸦与狐狸新传", date: "2026-04-16"},
+  9: {title: "对不起", date: "2026-04-17"},
+  10: {title: "摆锤", date: "2026-04-18"},
+  11: {title: "PostgreSQL vs MySQL：专业角度深度对比", date: "2026-04-18"},
+  12: {title: "⚽ 足球快报 | 2026年5月5日", date: "2026-05-05"}
+};
